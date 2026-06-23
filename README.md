@@ -2,8 +2,6 @@
 
 ExcaliDash adalah platform *whiteboarding* kolaboratif berbasis [Excalidraw](https://excalidraw.com/) yang di-*host* secara mandiri (*self-hosted*). Platform ini dilengkapi dengan *dashboard* manajemen untuk menyimpan, mengatur, dan berkolaborasi pada diagram atau sketsa secara *real-time* dengan aman di dalam infrastruktur sendiri.
 
-🌐 **Akses Aplikasi:** [https://excalidraw.niandev.com](https://excalidraw.niandev.com)
-
 ## ✨ Fitur Utama
 
 * **Penyimpanan Permanen (Persistent Storage):** Semua hasil gambar dan diagram disimpan secara aman di dalam *database* lokal (SQLite), tidak akan hilang saat sesi peramban ditutup.
