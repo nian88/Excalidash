@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  backend:
+    image: zimengxiong/excalidash-backend:latest
+    container_name: excalidash-backend
+    environment:
+      - DATABASE_PROVIDER=sqlite
+      - DATABASE_URL=file:/app/prisma/dev.db
+      - PORT=8000
+      - NODE_ENV=production
+      - AUTH_MODE=local
+      - FRONTEND_URL=https://excalidraw.domain.com
+      - CSRF_TRUSTED_ORIGINS=https://excalidraw.domain.com
+      - TRUST_PROXY=1
+      # Ganti "rahasia_jwt_anda" dan "rahasia_csrf_anda" dengan string acak yang aman
+      - JWT_SECRET=rahasia_jwt_anda
+      - CSRF_SECRET=rahasia_csrf_anda
+    volumes:
+      - ./backend-data:/app/prisma
+    networks:
+      - proxy
+      - excalidash_net
+    restart: unless-stopped
+    # Label Traefik DIHAPUS dari sini. Nginx di frontend yang akan menghubungi backend.
+
+  frontend:
+    image: zimengxiong/excalidash-frontend:latest
+    container_name: excalidash-frontend
+    depends_on:
+      - backend
+    # Tidak perlu BACKEND_URL di env karena Nginx sudah diarahkan statis ke http://backend:8000
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf.template:ro
+    networks:
+      - proxy
+      - excalidash_net
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      
+      # Router
+      - "traefik.http.routers.excalidash.rule=Host(`excalidraw.domain.com`)"
+      - "traefik.http.routers.excalidash.entrypoints=websecure"
+      
+      # SSL
+      - "traefik.http.routers.excalidash.tls=true"
+      - "traefik.http.routers.excalidash.tls.certresolver=letsencrypt"
+      
+      # Service port frontend nginx
+      - "traefik.http.services.excalidash.loadbalancer.server.port=80"
+
+networks:
+  proxy:
+    external: true
+  excalidash_net:
+    internal: true
